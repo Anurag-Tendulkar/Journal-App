@@ -59,4 +59,9 @@ dependencies {
 
   // needed for instantTaskExecutorRule
   androidTestImplementation "androidx.arch.core:core-testing:2.1.0"
+
+  // for room library
+  def room_version = "2.2.5"
+  implementation "androidx.room:room-runtime:$room_version"
+  annotationProcessor "androidx.room:room-compiler:$room_version"
 }

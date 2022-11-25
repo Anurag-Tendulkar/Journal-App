@@ -13,6 +13,7 @@
     <action
         android:id="@+id/addEntryAction"
         app:destination="@id/entryDetailsFragment" />
+
   </fragment>
   <fragment
       android:id="@+id/entryDetailsFragment"
@@ -21,8 +22,9 @@
       tools:layout="@layout/fragment_entry_details">
     <argument
         android:name="entryId"
-        android:defaultValue='""'
-        app:argType="string" />
+        android:defaultValue="null"
+        app:argType="java.util.UUID"
+        app:nullable="true"/>
     <action
         android:id="@+id/datePickerAction"
         app:destination="@id/datePickerDialog" />

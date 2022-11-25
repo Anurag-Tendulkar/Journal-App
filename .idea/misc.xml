@@ -3,6 +3,10 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/anura/a4-journalapp-Anurag-Tendulkar/app/src/main/res/layout/activity_main.xml" value="0.1796875" />
+        <entry key="..\:/Users/anura/a4-journalapp-Anurag-Tendulkar/app/src/main/res/layout/fragment_entry.xml" value="0.1796875" />
+        <entry key="..\:/Users/anura/a4-journalapp-Anurag-Tendulkar/app/src/main/res/layout/fragment_entry_details.xml" value="0.1796875" />
+        <entry key="..\:/Users/anura/a4-journalapp-Anurag-Tendulkar/app/src/main/res/layout/fragment_entry_list.xml" value="0.1796875" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.246875" />
         <entry key="app/src/main/res/layout/fragment_date_picker.xml" value="0.2569230769230769" />
         <entry key="app/src/main/res/layout/fragment_entry.xml" value="0.2609375" />
