@@ -2,9 +2,7 @@ package androidsamples.java.journalapp;
 
 import android.app.DatePickerDialog;
 import android.app.Dialog;
-import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 
 import java.util.Date;
@@ -54,7 +52,7 @@ public class DatePickerFragment extends DialogFragment {
     return new DatePickerDialog(requireContext(), (dp, y, m, d) -> {
       // store the date in the shared view model
       sharedVm.storeDate(y, m, d);
-      listener.onDialogClose();
+      listener.onDateDialogClose();
     },bundle.getInt("Year"),bundle.getInt("Month"),bundle.getInt("Date"));
   }
 }

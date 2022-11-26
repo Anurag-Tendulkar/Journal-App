@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModel;
 
 import java.util.List;
+import java.util.UUID;
 
 public class EntryListViewModel extends ViewModel {
     private final JournalRepository mRepository;
@@ -14,5 +15,9 @@ public class EntryListViewModel extends ViewModel {
 
     public LiveData<List<JournalEntry>> getAllEntries() {
         return mRepository.getAllEntries();
+    }
+
+    public LiveData<JournalEntry> getEntry(UUID uuid) {
+        return mRepository.getEntry(uuid);
     }
 }

@@ -1,5 +1,9 @@
 package androidsamples.java.journalapp;
 
 public interface OnDialogCloseListener {
-    void onDialogClose();
+    void onDateDialogClose();
+
+    void onStartTimeDialogClose();
+
+    void onEndTimeDialogClose();
 }

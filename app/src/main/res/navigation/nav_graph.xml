@@ -20,6 +20,9 @@
       android:name="androidsamples.java.journalapp.EntryDetailsFragment"
       android:label="fragment_entry_details"
       tools:layout="@layout/fragment_entry_details">
+    <action
+        android:id="@+id/saveEntryAction"
+        app:destination="@id/entryListFragment" />
     <argument
         android:name="entryId"
         android:defaultValue="@null"

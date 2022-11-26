@@ -17,6 +17,10 @@ public class EntryDetailsSharedViewModel extends ViewModel {
     private int tYear;
     private int tMonth;
     private int tDayOfMonth;
+    private int shr;
+    private int sm;
+    private int ehr;
+    private int em;
 
     public EntryDetailsSharedViewModel() {
         mRepository = JournalRepository.getInstance();
@@ -107,5 +111,23 @@ public class EntryDetailsSharedViewModel extends ViewModel {
                 break;
         }
         return "" + dayOfWeek + ", " + month + " " + tDayOfMonth + ", " + tYear;
+    }
+
+    public String getSTime() {
+        return shr + ":" + sm;
+    }
+
+    public String getETime() {
+        return ehr + ":" + em;
+    }
+
+    public void setStartTime(int hm, int m) {
+        shr = hm;
+        sm = m;
+    }
+
+    public void setEndTime(int hm, int m) {
+        ehr = hm;
+        em = m;
     }
 }

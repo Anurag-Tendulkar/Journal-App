@@ -11,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.Navigation;
 
 import java.util.Date;
 import java.util.UUID;
@@ -64,15 +65,49 @@ public class EntryDetailsFragment extends Fragment implements OnDialogCloseListe
             });
 
     btnSave.setOnClickListener(this::saveEntry);
-
-
-    btnDate.setOnClickListener(v -> {
-      DatePickerFragment newFragment = DatePickerFragment.newInstance(new Date(), this);
-      newFragment.show(getParentFragmentManager(), "datePicker");
-    });
-
+    btnDate.setOnClickListener(this::setDate);
+    btnSTime.setOnClickListener(this::setStartTime);
+    btnETime.setOnClickListener(this::setEndTime);
 
     return view;
+  }
+
+  private void setEndTime(View view) {
+    TimePickerFragment newFragment = TimePickerFragment.newInstance(new Date(), this, 'e');
+    newFragment.show(getParentFragmentManager(), "endTimePicker");
+  }
+
+  private void setStartTime(View view) {
+    TimePickerFragment newFragment = TimePickerFragment.newInstance(new Date(), this, 's');
+    newFragment.show(getParentFragmentManager(), "startTimePicker");
+  }
+
+  @Override
+  public void onDateDialogClose() {
+    setDateOnButton();
+  }
+
+  @Override
+  public void onStartTimeDialogClose() {
+    setSTime();
+  }
+
+  private void setSTime() {
+    btnSTime.setText(mEntryDetailsSharedViewModel.getSTime());
+  }
+
+  @Override
+  public void onEndTimeDialogClose() {
+    setETime();
+  }
+
+  private void setETime() {
+    btnETime.setText(mEntryDetailsSharedViewModel.getETime());
+  }
+
+  private void setDate(View view) {
+    DatePickerFragment newFragment = DatePickerFragment.newInstance(new Date(), this);
+    newFragment.show(getParentFragmentManager(), "datePicker");
   }
 
   private void setDateOnButton() {
@@ -91,17 +126,8 @@ public class EntryDetailsFragment extends Fragment implements OnDialogCloseListe
     mEntry.setMDate(btnDate.getText().toString());
     mEntry.setMsTime(btnSTime.getText().toString());
     mEntry.setMeTime(btnETime.getText().toString());
-
     mEntryDetailsSharedViewModel.saveEntry(mEntry);
-  }
 
-  @Override
-  public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-    super.onViewCreated(view, savedInstanceState);
-  }
-
-  @Override
-  public void onDialogClose() {
-    setDateOnButton();
+    Navigation.findNavController(v).navigate(EntryDetailsFragmentDirections.saveEntryAction());
   }
 }
