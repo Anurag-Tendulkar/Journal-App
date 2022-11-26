@@ -10,6 +10,8 @@ import java.util.UUID;
 
 @Entity(tableName = "journal_table")
 public class JournalEntry {
+
+
     @PrimaryKey
     @ColumnInfo(name = "id")
     @NonNull
@@ -28,53 +30,55 @@ public class JournalEntry {
     @ColumnInfo(name = "end_time")
     private String meTime;
 
-    public JournalEntry(@NonNull String title, @NonNull String date, @NonNull String stime, String etime){
+    public JournalEntry(String mTitle, String mDate, String msTime, String meTime){
         mUid = UUID.randomUUID();
-        mTitle = title;
-        mDate = date;
-        msTime = stime;
-        meTime = etime;
+        this.mTitle = mTitle;
+        this.mDate = mDate;
+        this.msTime = msTime;
+        this.meTime = meTime;
+    }
+    public JournalEntry() {
+        this(null, null, null, null);
     }
 
     @NonNull
-    public UUID getUid() {
+    public UUID getMUid() {
         return mUid;
     }
 
-
-    public String getTitle() {
-        return mTitle;
-    }
-
-    public String getDate() {
-        return mDate;
-    }
-
-    public String getSTime() {
-        return msTime;
-    }
-
-    public String getETime() {
-        return meTime;
-    }
-
-    public void setUid(@NonNull UUID mUid) {
+    public void setMUid(@NonNull UUID mUid) {
         this.mUid = mUid;
     }
 
-    public void setTitle(String mTitle) {
+    public String getMTitle() {
+        return mTitle;
+    }
+
+    public void setMTitle(String mTitle) {
         this.mTitle = mTitle;
     }
 
-    public void setDate(String mDate) {
+    public String getMDate() {
+        return mDate;
+    }
+
+    public void setMDate(String mDate) {
         this.mDate = mDate;
     }
 
-    public void setSTime(String msTime) {
+    public String getMsTime() {
+        return msTime;
+    }
+
+    public void setMsTime(String msTime) {
         this.msTime = msTime;
     }
 
-    public void setETime(String meTime) {
+    public String getMeTime() {
+        return meTime;
+    }
+
+    public void setMeTime(String meTime) {
         this.meTime = meTime;
     }
 }

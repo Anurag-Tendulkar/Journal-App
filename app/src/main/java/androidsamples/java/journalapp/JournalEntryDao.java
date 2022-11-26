@@ -24,5 +24,6 @@ public interface JournalEntryDao {
     @Delete
     void deleteJournalEntry(JournalEntry entry);
 
+    @Query("SELECT * from journal_table WHERE id=(:id)")
     LiveData<JournalEntry> getEntry(UUID id);
 }

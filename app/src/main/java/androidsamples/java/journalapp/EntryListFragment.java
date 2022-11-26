@@ -76,10 +76,10 @@ public class EntryListFragment extends Fragment {
     public void onBindViewHolder(@NonNull EntryListAdapter.EntryViewHolder holder, int position) {
       if (mEntries != null) {
         JournalEntry current = mEntries.get(position);
-        holder.mTxtTitle.setText(current.getTitle());
-        holder.mTxtDate.setText(current.getDate());
-        holder.mSTime.setText(current.getSTime());
-        holder.mETime.setText(current.getETime());
+        holder.mTxtTitle.setText(current.getMTitle());
+        holder.mTxtDate.setText(current.getMDate());
+        holder.mSTime.setText(current.getMsTime());
+        holder.mETime.setText(current.getMeTime());
       }
     }
 

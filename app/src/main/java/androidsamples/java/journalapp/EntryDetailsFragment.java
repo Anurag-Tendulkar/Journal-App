@@ -12,6 +12,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import java.util.Date;
 import java.util.UUID;
 
 /**
@@ -19,10 +20,11 @@ import java.util.UUID;
  * Use the {@link EntryDetailsFragment # newInstance} factory method to
  * create an instance of this fragment.
  */
-public class EntryDetailsFragment extends Fragment {
+public class EntryDetailsFragment extends Fragment implements OnDialogCloseListener {
 
+  private static final String TAG = "EntryDetailsFragment";
   private JournalEntry mEntry;
-  private EntryDetailsViewModel mEntryDetailsViewModel;
+  private EntryDetailsSharedViewModel mEntryDetailsSharedViewModel;
   private EditText txtTitle;
   private Button btnSTime;
   private Button btnETime;
@@ -33,9 +35,14 @@ public class EntryDetailsFragment extends Fragment {
   public void onCreate(@Nullable Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setHasOptionsMenu(true);
+    mEntryDetailsSharedViewModel = new ViewModelProvider(getActivity()).get(EntryDetailsSharedViewModel.class);
     UUID entryID = EntryDetailsFragmentArgs.fromBundle(getArguments()).getEntryId();
-    mEntryDetailsViewModel = new ViewModelProvider(getActivity()).get(EntryDetailsViewModel.class);
-    mEntryDetailsViewModel.loadEntry(entryID);
+    if(entryID != null) {
+      mEntryDetailsSharedViewModel.loadEntry(entryID);
+    }
+    else {
+      mEntry = new JournalEntry();
+    }
   }
 
 
@@ -50,7 +57,7 @@ public class EntryDetailsFragment extends Fragment {
     btnETime = view.findViewById(R.id.btn_end_time);
     btnSave = view.findViewById(R.id.btn_save);
 
-    mEntryDetailsViewModel.getEntryLiveData().observe(getActivity(),
+    mEntryDetailsSharedViewModel.getEntryLiveData().observe(getActivity(),
             entry -> {
               this.mEntry = entry;
               updateUI();
@@ -58,27 +65,43 @@ public class EntryDetailsFragment extends Fragment {
 
     btnSave.setOnClickListener(this::saveEntry);
 
+
+    btnDate.setOnClickListener(v -> {
+      DatePickerFragment newFragment = DatePickerFragment.newInstance(new Date(), this);
+      newFragment.show(getParentFragmentManager(), "datePicker");
+    });
+
+
     return view;
   }
 
+  private void setDateOnButton() {
+    btnDate.setText(mEntryDetailsSharedViewModel.setDate());
+  }
+
   private void updateUI() {
-    txtTitle.setText(mEntry.getTitle());
-    btnDate.setText(mEntry.getDate());
-    btnSTime.setText(mEntry.getSTime());
-    btnETime.setText(mEntry.getETime());
+    txtTitle.setText(mEntry.getMTitle());
+    btnDate.setText(mEntry.getMDate());
+    btnSTime.setText(mEntry.getMsTime());
+    btnETime.setText(mEntry.getMeTime());
   }
 
   private void saveEntry(View v) {
-    mEntry.setTitle(txtTitle.getText().toString());
-    mEntry.setDate(btnDate.getText().toString());
-    mEntry.setSTime(btnSTime.getText().toString());
-    mEntry.setETime(btnETime.getText().toString());
+    mEntry.setMTitle(txtTitle.getText().toString());
+    mEntry.setMDate(btnDate.getText().toString());
+    mEntry.setMsTime(btnSTime.getText().toString());
+    mEntry.setMeTime(btnETime.getText().toString());
 
-    mEntryDetailsViewModel.saveEntry(mEntry);
+    mEntryDetailsSharedViewModel.saveEntry(mEntry);
   }
 
   @Override
   public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
     super.onViewCreated(view, savedInstanceState);
+  }
+
+  @Override
+  public void onDialogClose() {
+    setDateOnButton();
   }
 }
