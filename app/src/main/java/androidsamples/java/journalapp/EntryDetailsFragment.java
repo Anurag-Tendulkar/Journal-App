@@ -12,6 +12,8 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
+//import androidsamples.java.journalapp.EntryDetailsFragmentDirections.PutEntry;
+
 
 import java.util.Date;
 import java.util.UUID;
@@ -126,8 +128,8 @@ public class EntryDetailsFragment extends Fragment implements OnDialogCloseListe
     mEntry.setMDate(btnDate.getText().toString());
     mEntry.setMsTime(btnSTime.getText().toString());
     mEntry.setMeTime(btnETime.getText().toString());
-    mEntryDetailsSharedViewModel.saveEntry(mEntry);
+    mEntryDetailsSharedViewModel.insertEntry(mEntry);
 
-    Navigation.findNavController(v).navigate(EntryDetailsFragmentDirections.saveEntryAction());
+    Navigation.findNavController(v).navigate(EntryDetailsFragmentDirections.putEntry());
   }
 }

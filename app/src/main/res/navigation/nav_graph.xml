@@ -21,7 +21,7 @@
       android:label="fragment_entry_details"
       tools:layout="@layout/fragment_entry_details">
     <action
-        android:id="@+id/saveEntryAction"
+        android:id="@+id/putEntry"
         app:destination="@id/entryListFragment" />
     <argument
         android:name="entryId"

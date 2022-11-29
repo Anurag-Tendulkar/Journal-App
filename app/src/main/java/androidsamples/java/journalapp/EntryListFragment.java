@@ -52,7 +52,7 @@ public class EntryListFragment extends Fragment {
   }
 
   private void addNewEntry(View view) {
-    AddEntryAction action = EntryListFragmentDirections.addEntryAction();
+    EntryListFragmentDirections.AddEntryAction action = EntryListFragmentDirections.addEntryAction();
     Navigation.findNavController(view).navigate(action);
   }
 
