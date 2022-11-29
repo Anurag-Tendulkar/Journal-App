@@ -80,6 +80,11 @@ public class EntryListFragment extends Fragment {
         holder.mTxtDate.setText(current.getMDate());
         holder.mSTime.setText(current.getMsTime());
         holder.mETime.setText(current.getMeTime());
+        holder.itemView.setOnClickListener(v -> {
+          EntryListFragmentDirections.AddEntryAction action = EntryListFragmentDirections.addEntryAction();
+          action.setEntryId(current.getMUid());
+          Navigation.findNavController(v).navigate(action);
+        });
       }
     }
 
