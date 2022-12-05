@@ -6,4 +6,6 @@ public interface OnDialogCloseListener {
     void onStartTimeDialogClose();
 
     void onEndTimeDialogClose();
+
+    void onDeleteEntryDialogClose();
 }

@@ -2,6 +2,9 @@ package androidsamples.java.journalapp;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -11,6 +14,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
 //import androidsamples.java.journalapp.EntryDetailsFragmentDirections.PutEntry;
 
@@ -42,9 +46,11 @@ public class EntryDetailsFragment extends Fragment implements OnDialogCloseListe
     UUID entryID = EntryDetailsFragmentArgs.fromBundle(getArguments()).getEntryId();
     if(entryID != null) {
       mEntryDetailsSharedViewModel.loadEntry(entryID);
+      mEntryDetailsSharedViewModel.setOldEntry(true); // for updating old entry on save
     }
     else {
       mEntry = new JournalEntry();
+      mEntryDetailsSharedViewModel.setOldEntry(false); // for creating new entry on save
     }
   }
 
@@ -63,10 +69,11 @@ public class EntryDetailsFragment extends Fragment implements OnDialogCloseListe
     mEntryDetailsSharedViewModel.getEntryLiveData().observe(getActivity(),
             entry -> {
               this.mEntry = entry;
-              updateUI();
+              if(this.mEntry != null)
+                updateUI();
             });
 
-    btnSave.setOnClickListener(this::saveEntry);
+    btnSave.setOnClickListener(mEntryDetailsSharedViewModel.isOldEntry()? this::saveOldEntry: this::saveNewEntry);
     btnDate.setOnClickListener(this::setDate);
     btnSTime.setOnClickListener(this::setStartTime);
     btnETime.setOnClickListener(this::setEndTime);
@@ -84,9 +91,25 @@ public class EntryDetailsFragment extends Fragment implements OnDialogCloseListe
     newFragment.show(getParentFragmentManager(), "startTimePicker");
   }
 
+  // for menu
+  @Override
+  public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+    super.onCreateOptionsMenu(menu, inflater);
+    inflater.inflate(R.menu.entry_details_fragment_menus, menu);
+  }
+
+  @Override
+  public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+    if(item.getItemId() == R.id.delete_entry) {
+      new DeleteEntryFragment(this).show(getParentFragmentManager(), "DELETE");
+      return true;
+    }
+    return super.onOptionsItemSelected(item);
+  }
+
   @Override
   public void onDateDialogClose() {
-    setDateOnButton();
+    btnDate.setText(mEntryDetailsSharedViewModel.setDate());
   }
 
   @Override
@@ -103,6 +126,13 @@ public class EntryDetailsFragment extends Fragment implements OnDialogCloseListe
     setETime();
   }
 
+  @Override
+  public void onDeleteEntryDialogClose() {
+    mEntryDetailsSharedViewModel.deleteEntry(mEntry);
+    NavDirections action = EntryDetailsFragmentDirections.onDeleteToEntryList();
+    Navigation.findNavController(requireView()).navigate(action);
+  }
+
   private void setETime() {
     btnETime.setText(mEntryDetailsSharedViewModel.getETime());
   }
@@ -112,9 +142,6 @@ public class EntryDetailsFragment extends Fragment implements OnDialogCloseListe
     newFragment.show(getParentFragmentManager(), "datePicker");
   }
 
-  private void setDateOnButton() {
-    btnDate.setText(mEntryDetailsSharedViewModel.setDate());
-  }
 
   private void updateUI() {
     txtTitle.setText(mEntry.getMTitle());
@@ -123,12 +150,22 @@ public class EntryDetailsFragment extends Fragment implements OnDialogCloseListe
     btnETime.setText(mEntry.getMeTime());
   }
 
-  private void saveEntry(View v) {
+  private void saveNewEntry(View v) {
     mEntry.setMTitle(txtTitle.getText().toString());
     mEntry.setMDate(btnDate.getText().toString());
     mEntry.setMsTime(btnSTime.getText().toString());
     mEntry.setMeTime(btnETime.getText().toString());
     mEntryDetailsSharedViewModel.insertEntry(mEntry);
+
+    Navigation.findNavController(v).navigate(EntryDetailsFragmentDirections.putEntry());
+  }
+
+  private void saveOldEntry(View v) {
+    mEntry.setMTitle(txtTitle.getText().toString());
+    mEntry.setMDate(btnDate.getText().toString());
+    mEntry.setMsTime(btnSTime.getText().toString());
+    mEntry.setMeTime(btnETime.getText().toString());
+    mEntryDetailsSharedViewModel.updateEntry(mEntry);
 
     Navigation.findNavController(v).navigate(EntryDetailsFragmentDirections.putEntry());
   }

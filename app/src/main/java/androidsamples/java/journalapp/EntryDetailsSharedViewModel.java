@@ -1,5 +1,7 @@
 package androidsamples.java.journalapp;
 
+import android.util.Log;
+
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Transformations;
@@ -10,6 +12,7 @@ import java.util.GregorianCalendar;
 import java.util.UUID;
 
 public class EntryDetailsSharedViewModel extends ViewModel {
+    private static final String TAG = "EntryDetailsVM";
     private final JournalRepository mRepository;
 
     private final MutableLiveData<UUID> entryIdLiveData = new MutableLiveData<>();
@@ -22,16 +25,31 @@ public class EntryDetailsSharedViewModel extends ViewModel {
     private int ehr;
     private int em;
 
+    public boolean isOldEntry() {
+        return oldEntry;
+    }
+
+    public void setOldEntry(boolean oldEntry) {
+        this.oldEntry = oldEntry;
+    }
+
+    private boolean oldEntry;
+
+
+
     public EntryDetailsSharedViewModel() {
         mRepository = JournalRepository.getInstance();
     }
 
-    void saveEntry(JournalEntry entry) {
+    void updateEntry(JournalEntry entry) {
         mRepository.update(entry);
     }
+
     void insertEntry(JournalEntry entry) {
         mRepository.insert(entry);
     }
+
+    void deleteEntry(JournalEntry entry){ mRepository.delete(entry);}
 
     LiveData<JournalEntry> getEntryLiveData() {
         return Transformations.switchMap(entryIdLiveData, mRepository::getEntry);
@@ -44,10 +62,12 @@ public class EntryDetailsSharedViewModel extends ViewModel {
         tYear = y;
         tMonth = m;
         tDayOfMonth = d;
+        Log.d(TAG, "day of month"+d);
     }
 
     public String setDate() {
         String dayOfWeek = "", month = "";
+        Log.d(TAG, "year"+tYear+"month"+tMonth+"day_of_month"+tDayOfMonth);
         GregorianCalendar calendar = new GregorianCalendar(tYear, tMonth, tDayOfMonth);
         switch (tMonth) {
             case 0:
@@ -87,7 +107,8 @@ public class EntryDetailsSharedViewModel extends ViewModel {
                 month = "DEC";
                 break;
         }
-        switch (Calendar.DAY_OF_WEEK) {
+        Log.d(TAG, "day of week "+calendar.get(Calendar.DAY_OF_WEEK));
+        switch (calendar.get(Calendar.DAY_OF_WEEK)) {
             case 1:
                 dayOfWeek = "SUN";
                 break;

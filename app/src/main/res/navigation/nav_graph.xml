@@ -46,6 +46,12 @@
         android:name="selectedDate"
         app:argType="integer"
         android:defaultValue="0" />
+    <action
+        android:id="@+id/action_entryDetailsFragment_to_onDeleteConformationDialog2"
+        app:destination="@id/onDeleteConformationDialog" />
+    <action
+        android:id="@+id/onDeleteToEntryList"
+        app:destination="@id/entryListFragment" />
   </fragment>
 
   <dialog
@@ -55,4 +61,8 @@
   <dialog
       android:id="@+id/timePickerDialog"
       android:name="androidsamples.java.journalapp.TimePickerFragment" />
+
+  <dialog
+      android:id="@+id/onDeleteConformationDialog"
+      android:name="androidsamples.java.journalapp.DeleteEntryFragment"/>
 </navigation>
