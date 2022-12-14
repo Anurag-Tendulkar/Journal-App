@@ -14,3 +14,15 @@ App crashes on deleting an entry
 
 <h2/> Flow of development </h2>
 I began development of JournalApp with an overview of the navigation graph and the various fragments. Actions were implemented to move between the EntryList fragment and the Details fragment. For navigating to the dialogs, the Fragment manager was used to create the dialogs and pass the required listeners to be called after dismissal. I changed the conditions for navigating to different fragments. For example, navigation to the Entry Details Fragment was different for a new or existing entry, with the UID being passed based on the condition. Data was passed between fragments using a SharedViewModel.
+
+<h2/> Database development </h2>
+To implement the room database for the JournalApp, the following steps were taken:
+
+The entity class JournalEntry was created to define the data types of the columns, including UUID for the column id, string for the title, and date and time for the start and end times.
+The JournalEntryDao and JournalRoomDatabase were created, with additional functionality for insert and delete added.
+The JournalRepository was created to connect to the JournalRoomDatabase, and TypeConverters were created for UUID and time.
+The JournalEntryAdapter was created to connect the data and viewmodel. Separate viewmodels were created for the EntryDetails and EntryList fragments.
+The RecyclerView was added to the EntryListFragment and connected to the viewmodel.
+The addEntry and saveEntry methods were called when clicking on a new or existing entry, respectively.
+Dialogs were appropriately called and data was passed back using a SharedViewModel and listeners to update the UI on dismissal.
+The Save button called the appropriate add or save method for new or existing entries.
