@@ -26,3 +26,14 @@ The RecyclerView was added to the EntryListFragment and connected to the viewmod
 The addEntry and saveEntry methods were called when clicking on a new or existing entry, respectively.
 Dialogs were appropriately called and data was passed back using a SharedViewModel and listeners to update the UI on dismissal.
 The Save button called the appropriate add or save method for new or existing entries.
+
+<h2/> delete menu </h2>
+I began by adding a delete option to the EntryDetailsFragment menu. I then created a confirmation dialog using an AlertDialog and displayed it when the delete option was selected. I used a SharedViewModel to determine if the user pressed the Yes button for delete. If yes, I used the deleteEntry method to delete the entry, which called an SQL DELETE query underneath.
+
+<h2/> accessibility and testing </h2>
+I ran talkback on my app and found that when using the app for the first time the users do not know that selecting the entry alows the user to update it
+Accessibility scanner gave a few issuses.
+I tried testing my database by reading docs online but there were errors which i could not resolve when i tried to implement it
+
+<h2/> Time and difficulty </h2>
+I took me about 30 hours to do this assignment and I rate it 9.5 / 10
