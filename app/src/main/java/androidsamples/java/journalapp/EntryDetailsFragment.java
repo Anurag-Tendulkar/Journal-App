@@ -1,6 +1,7 @@
 package androidsamples.java.journalapp;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -9,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -50,6 +52,7 @@ public class EntryDetailsFragment extends Fragment implements OnDialogCloseListe
     }
     else {
       mEntry = new JournalEntry();
+      Log.d(TAG, "New Entry"+mEntry);
       mEntryDetailsSharedViewModel.setOldEntry(false); // for creating new entry on save
     }
   }
@@ -72,7 +75,7 @@ public class EntryDetailsFragment extends Fragment implements OnDialogCloseListe
               if(this.mEntry != null)
                 updateUI();
             });
-
+    Log.d(TAG, "New Entry"+mEntry);
     btnSave.setOnClickListener(mEntryDetailsSharedViewModel.isOldEntry()? this::saveOldEntry: this::saveNewEntry);
     btnDate.setOnClickListener(this::setDate);
     btnSTime.setOnClickListener(this::setStartTime);
@@ -151,22 +154,31 @@ public class EntryDetailsFragment extends Fragment implements OnDialogCloseListe
   }
 
   private void saveNewEntry(View v) {
-    mEntry.setMTitle(txtTitle.getText().toString());
-    mEntry.setMDate(btnDate.getText().toString());
-    mEntry.setMsTime(btnSTime.getText().toString());
-    mEntry.setMeTime(btnETime.getText().toString());
-    mEntryDetailsSharedViewModel.insertEntry(mEntry);
+    if(txtTitle.getText().toString().equals("Title") || btnDate.getText().toString().equals("DATE") || btnSTime.getText().toString().equals("START TIME") || btnETime.getText().toString().equals("END TIME")) {
+      Toast.makeText(getContext(), "Fill all entries", Toast.LENGTH_SHORT).show();
+    } else {
+      mEntry.setMTitle(txtTitle.getText().toString());
+      mEntry.setMDate(btnDate.getText().toString());
+      mEntry.setMsTime(btnSTime.getText().toString());
+      mEntry.setMeTime(btnETime.getText().toString());
+      mEntryDetailsSharedViewModel.insertEntry(mEntry);
 
-    Navigation.findNavController(v).navigate(EntryDetailsFragmentDirections.putEntry());
+      Navigation.findNavController(v).navigate(EntryDetailsFragmentDirections.putEntry());
+    }
+
   }
 
   private void saveOldEntry(View v) {
-    mEntry.setMTitle(txtTitle.getText().toString());
-    mEntry.setMDate(btnDate.getText().toString());
-    mEntry.setMsTime(btnSTime.getText().toString());
-    mEntry.setMeTime(btnETime.getText().toString());
-    mEntryDetailsSharedViewModel.updateEntry(mEntry);
 
-    Navigation.findNavController(v).navigate(EntryDetailsFragmentDirections.putEntry());
+    if(txtTitle.getText().toString().equals("") || btnDate.getText().toString().equals("") || btnSTime.getText().toString().equals("") || btnETime.getText().toString().equals("")) {
+      Toast.makeText(getContext(), "Fill all entries", Toast.LENGTH_SHORT).show();
+    } else {
+      mEntry.setMTitle(txtTitle.getText().toString());
+      mEntry.setMDate(btnDate.getText().toString());
+      mEntry.setMsTime(btnSTime.getText().toString());
+      mEntry.setMeTime(btnETime.getText().toString());
+      mEntryDetailsSharedViewModel.updateEntry(mEntry);
+      Navigation.findNavController(v).navigate(EntryDetailsFragmentDirections.putEntry());
+    }
   }
 }
