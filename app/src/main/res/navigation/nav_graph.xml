@@ -13,6 +13,9 @@
     <action
         android:id="@+id/addEntryAction"
         app:destination="@id/entryDetailsFragment" />
+    <action
+        android:id="@+id/action_get_info"
+        app:destination="@id/infoFragment" />
 
   </fragment>
   <fragment
@@ -65,4 +68,9 @@
   <dialog
       android:id="@+id/onDeleteConformationDialog"
       android:name="androidsamples.java.journalapp.DeleteEntryFragment"/>
+  <fragment
+      android:id="@+id/infoFragment"
+      android:name="androidsamples.java.journalapp.InfoFragment"
+      android:label="fragment_info"
+      tools:layout="@layout/fragment_info" />
 </navigation>

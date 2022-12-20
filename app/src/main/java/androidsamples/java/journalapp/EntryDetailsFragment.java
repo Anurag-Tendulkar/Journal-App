@@ -1,5 +1,6 @@
 package androidsamples.java.journalapp;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -45,18 +46,25 @@ public class EntryDetailsFragment extends Fragment implements OnDialogCloseListe
     super.onCreate(savedInstanceState);
     setHasOptionsMenu(true);
     mEntryDetailsSharedViewModel = new ViewModelProvider(getActivity()).get(EntryDetailsSharedViewModel.class);
-    UUID entryID = EntryDetailsFragmentArgs.fromBundle(getArguments()).getEntryId();
-    if(entryID != null) {
-      mEntryDetailsSharedViewModel.loadEntry(entryID);
+    UUID entryId = EntryDetailsFragmentArgs.fromBundle(getArguments()).getEntryId();
+    if(! (entryId == null)) {
+      mEntryDetailsSharedViewModel.loadEntry(entryId);
+      Log.d(TAG, "old uuid "+ entryId);
       mEntryDetailsSharedViewModel.setOldEntry(true); // for updating old entry on save
     }
     else {
       mEntry = new JournalEntry();
-      Log.d(TAG, "New Entry"+mEntry);
+      Log.d(TAG, "New uuid "+mEntry.getMUid() + ", mentry : "+mEntry);
       mEntryDetailsSharedViewModel.setOldEntry(false); // for creating new entry on save
     }
+
+    Log.d(TAG, "isOldEntry()"+ mEntryDetailsSharedViewModel.isOldEntry());
   }
 
+  @Override
+  public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+
+  }
 
   @Nullable
   @Override
@@ -69,13 +77,17 @@ public class EntryDetailsFragment extends Fragment implements OnDialogCloseListe
     btnETime = view.findViewById(R.id.btn_end_time);
     btnSave = view.findViewById(R.id.btn_save);
 
-    mEntryDetailsSharedViewModel.getEntryLiveData().observe(getActivity(),
-            entry -> {
-              this.mEntry = entry;
-              if(this.mEntry != null)
-                updateUI();
-            });
-    Log.d(TAG, "New Entry"+mEntry);
+    if(mEntryDetailsSharedViewModel.isOldEntry())
+    {
+      mEntryDetailsSharedViewModel.getEntryLiveData().observe(getActivity(),
+              entry -> {
+                this.mEntry = entry;
+                if(this.mEntry != null) {
+                  updateUI();
+                  Log.d(TAG, "in observe in entrydetailsfragment and mentry is not null, " +mEntry.getMTitle());
+                }
+              });
+    }
     btnSave.setOnClickListener(mEntryDetailsSharedViewModel.isOldEntry()? this::saveOldEntry: this::saveNewEntry);
     btnDate.setOnClickListener(this::setDate);
     btnSTime.setOnClickListener(this::setStartTime);
@@ -104,11 +116,36 @@ public class EntryDetailsFragment extends Fragment implements OnDialogCloseListe
   @Override
   public boolean onOptionsItemSelected(@NonNull MenuItem item) {
     if(item.getItemId() == R.id.delete_entry) {
-      new DeleteEntryFragment(this).show(getParentFragmentManager(), "DELETE");
+      if(mEntryDetailsSharedViewModel.isOldEntry())
+        new DeleteEntryFragment(this).show(getParentFragmentManager(), "DELETE");
+      else
+        Toast.makeText(getContext(), "Save Entry Before Delete!", Toast.LENGTH_SHORT).show();
+
       return true;
+    }
+
+    if(item.getItemId() == R.id.share_event) {
+      if(mEntryDetailsSharedViewModel.isOldEntry()) {
+        String send = "Look what I have been up to: " + mEntry.getMTitle() + " on " + mEntry.getMDate() + ", " + mEntry.getMsTime() + " to " + mEntry.getMeTime();
+        Intent intent = new Intent();
+        intent.setAction(Intent.ACTION_SEND);
+        intent.putExtra(Intent.EXTRA_TEXT, send);
+        intent.setType("text/plain");
+
+        Intent shareIntent = Intent.createChooser(intent, getResources().getString(R.string.share_with));
+        if(shareIntent.resolveActivity(requireActivity().getPackageManager()) != null) {
+          startActivity(shareIntent);
+        }
+        else {
+          Log.d(TAG, "Not apps available to share");
+        }
+
+        return true;
+      }
     }
     return super.onOptionsItemSelected(item);
   }
+
 
   @Override
   public void onDateDialogClose() {
@@ -154,31 +191,64 @@ public class EntryDetailsFragment extends Fragment implements OnDialogCloseListe
   }
 
   private void saveNewEntry(View v) {
-    if(txtTitle.getText().toString().equals("Title") || btnDate.getText().toString().equals("DATE") || btnSTime.getText().toString().equals("START TIME") || btnETime.getText().toString().equals("END TIME")) {
+    if(txtTitle.getText().toString().equals("Title") || btnDate.getText().toString().equals("Date") || btnSTime.getText().toString().equals("Start Time") || btnETime.getText().toString().equals("End Time")) {
       Toast.makeText(getContext(), "Fill all entries", Toast.LENGTH_SHORT).show();
-    } else {
-      mEntry.setMTitle(txtTitle.getText().toString());
-      mEntry.setMDate(btnDate.getText().toString());
-      mEntry.setMsTime(btnSTime.getText().toString());
-      mEntry.setMeTime(btnETime.getText().toString());
-      mEntryDetailsSharedViewModel.insertEntry(mEntry);
-
-      Navigation.findNavController(v).navigate(EntryDetailsFragmentDirections.putEntry());
     }
+    else {
+      String sTime = btnSTime.getText().toString();
+      String eTime = btnETime.getText().toString();
 
+      int shr, sm, ehr, em;
+
+      shr = Integer.parseInt(sTime.substring(0, sTime.indexOf(":")));
+      sm = Integer.parseInt(sTime.substring(sTime.indexOf(":")+1));
+
+      ehr = Integer.parseInt(eTime.substring(0, eTime.indexOf(":")));
+      em = Integer.parseInt(eTime.substring(eTime.indexOf(":")+1));
+
+      if(shr > ehr || ((shr == ehr) && (sm > em))) {
+        Toast.makeText(getContext(), "EndTime must be greater than start time", Toast.LENGTH_SHORT).show();
+      }
+      else {
+        mEntry.setMTitle(txtTitle.getText().toString());
+        mEntry.setMDate(btnDate.getText().toString());
+        mEntry.setMsTime(btnSTime.getText().toString());
+        mEntry.setMeTime(btnETime.getText().toString());
+        mEntryDetailsSharedViewModel.insertEntry(mEntry);
+
+        Navigation.findNavController(v).navigate(EntryDetailsFragmentDirections.putEntry());
+      }
+    }
   }
 
   private void saveOldEntry(View v) {
 
     if(txtTitle.getText().toString().equals("") || btnDate.getText().toString().equals("") || btnSTime.getText().toString().equals("") || btnETime.getText().toString().equals("")) {
       Toast.makeText(getContext(), "Fill all entries", Toast.LENGTH_SHORT).show();
-    } else {
-      mEntry.setMTitle(txtTitle.getText().toString());
-      mEntry.setMDate(btnDate.getText().toString());
-      mEntry.setMsTime(btnSTime.getText().toString());
-      mEntry.setMeTime(btnETime.getText().toString());
-      mEntryDetailsSharedViewModel.updateEntry(mEntry);
-      Navigation.findNavController(v).navigate(EntryDetailsFragmentDirections.putEntry());
+    }
+    else{
+      String sTime = btnSTime.getText().toString();
+      String eTime = btnETime.getText().toString();
+
+      int shr, sm, ehr, em;
+
+      shr = Integer.parseInt(sTime.substring(0, sTime.indexOf(":")));
+      sm = Integer.parseInt(sTime.substring(sTime.indexOf(":") + 1));
+
+      ehr = Integer.parseInt(eTime.substring(0, eTime.indexOf(":")));
+      em = Integer.parseInt(eTime.substring(eTime.indexOf(":") + 1));
+
+      if (shr > ehr || ((shr == ehr) && (sm > em))) {
+        Toast.makeText(getContext(), "EndTime must be greater than start time", Toast.LENGTH_SHORT).show();
+      }
+      else {
+        mEntry.setMTitle(txtTitle.getText().toString());
+        mEntry.setMDate(btnDate.getText().toString());
+        mEntry.setMsTime(btnSTime.getText().toString());
+        mEntry.setMeTime(btnETime.getText().toString());
+        mEntryDetailsSharedViewModel.updateEntry(mEntry);
+        Navigation.findNavController(v).navigate(EntryDetailsFragmentDirections.putEntry());
+      }
     }
   }
 }

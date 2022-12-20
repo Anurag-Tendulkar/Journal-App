@@ -2,7 +2,11 @@ package androidsamples.java.journalapp;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -11,6 +15,8 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavController;
+import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -26,11 +32,13 @@ import androidsamples.java.journalapp.EntryListFragmentDirections.AddEntryAction
  */
 public class EntryListFragment extends Fragment {
 
+  private static final String TAG = "EntryListFragment";
   private EntryListViewModel mEntryListViewModel;
 
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
+    setHasOptionsMenu(true);
     mEntryListViewModel = new ViewModelProvider(this).get(EntryListViewModel.class);
   }
 
@@ -83,6 +91,7 @@ public class EntryListFragment extends Fragment {
         holder.itemView.setOnClickListener(v -> {
           EntryListFragmentDirections.AddEntryAction action = EntryListFragmentDirections.addEntryAction();
           action.setEntryId(current.getMUid());
+          Log.d(TAG, "mentry : " +current.getMTitle() + ", " + current);
           Navigation.findNavController(v).navigate(action);
         });
       }
@@ -121,5 +130,21 @@ public class EntryListFragment extends Fragment {
     Bundle args = new Bundle();
     fragment.setArguments(args);
     return fragment;
+  }
+
+  @Override
+  public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+    super.onCreateOptionsMenu(menu, inflater);
+    inflater.inflate(R.menu.info_entry_list_fragment, menu);
+  }
+
+  @Override
+  public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+    if (item.getItemId() == R.id.app_info) {
+      NavDirections action = EntryListFragmentDirections.actionGetInfo();
+      Navigation.findNavController(getView()).navigate(action);
+      return true;
+    }
+    return super.onOptionsItemSelected(item);
   }
 }
