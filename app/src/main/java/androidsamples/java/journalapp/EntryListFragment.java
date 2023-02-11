@@ -1,6 +1,11 @@
 package androidsamples.java.journalapp;
 
 import android.content.Context;
+
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -12,6 +17,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.ViewModelProvider;
@@ -30,16 +36,23 @@ import androidsamples.java.journalapp.EntryListFragmentDirections.AddEntryAction
 /**
  * A fragment representing a list of Items.
  */
-public class EntryListFragment extends Fragment {
+public class EntryListFragment extends Fragment implements SensorEventListener {
 
   private static final String TAG = "EntryListFragment";
   private EntryListViewModel mEntryListViewModel;
+  private static final float SHAKE_THRESHOLD_GRAVITY = 2.7F;
+  private SensorManager mSensorManager;
+  private Sensor mAccelerometer;
+
 
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setHasOptionsMenu(true);
     mEntryListViewModel = new ViewModelProvider(this).get(EntryListViewModel.class);
+
+    mSensorManager = (SensorManager) requireActivity().getSystemService(Context.SENSOR_SERVICE);
+    mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
   }
 
   @Override
@@ -91,7 +104,6 @@ public class EntryListFragment extends Fragment {
         holder.itemView.setOnClickListener(v -> {
           EntryListFragmentDirections.AddEntryAction action = EntryListFragmentDirections.addEntryAction();
           action.setEntryId(current.getMUid());
-          Log.d(TAG, "mentry : " +current.getMTitle() + ", " + current);
           Navigation.findNavController(v).navigate(action);
         });
       }
@@ -146,5 +158,36 @@ public class EntryListFragment extends Fragment {
       return true;
     }
     return super.onOptionsItemSelected(item);
+  }
+
+  @Override
+  public void onSensorChanged(SensorEvent sensorEvent) {
+    float x = sensorEvent.values[0]/SensorManager.GRAVITY_EARTH;
+    float y = sensorEvent.values[1]/SensorManager.GRAVITY_EARTH;
+    float z = sensorEvent.values[2]/SensorManager.GRAVITY_EARTH;
+
+    float gForce = (float)Math.sqrt(x * x + y * y + z * z);
+
+    if(gForce > SHAKE_THRESHOLD_GRAVITY) {
+      // create a new entry
+      addNewEntry(getView());
+    }
+  }
+
+  @Override
+  public void onAccuracyChanged(Sensor sensor, int i) {
+    // lite
+  }
+
+  @Override
+  public void onStart() {
+    super.onStart();
+    mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
+  }
+
+  @Override
+  public void onStop() {
+    super.onStop();
+    mSensorManager.unregisterListener(this);
   }
 }
